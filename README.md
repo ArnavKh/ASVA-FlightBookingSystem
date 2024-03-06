@@ -7,4 +7,3 @@ Members of this project are:
 - Surab Sebait
 - Vaidat Patel
 - Aaditya Mehta
-1234
