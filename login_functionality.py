@@ -18,7 +18,7 @@ users_collection = db['User_Data']
 def index():
     # If user is already logged in, no need to prompt login again
     if 'username' in session:
-        return 'You are already logged in'
+        session.clear()
 
     # Prompt user to login
     return redirect('/login')
