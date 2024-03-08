@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block body %}
+<div>
+    <div>
+        <div>
+            <form method=POST action="{{ url_for('logout') }}">
+                    <p>Logged in as {{ session['username'] }}</p>
+                    <button type="submit">Log Out</button>
+            </form>
+            <br>
+        </div>
+    </div>
+</div>
+{% endblock %}
