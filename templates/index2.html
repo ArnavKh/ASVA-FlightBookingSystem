@@ -1,0 +1,19 @@
+<!-- index2.html -->
+
+{% extends "base1.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <h1>Welcome to Our Flight Booking Service!</h1>
+
+    {% if show_profile %}
+        <p>Hello, {{ email }}!</p>
+        <p><a href="{{ url_for('profile_home', email=session['email']) }}">Go to your profile</a></p>
+        <p><a href="{{ url_for('my_bookings') }}">View My Bookings</a></p>
+        <p><a href="{{ url_for('logout') }}">Logout</a></p>
+    {% elif show_login %}
+        <p>Please <a href="{{ url_for('login') }}">log in</a> to access additional features.</p>
+        <p>New user? <a href="{{ url_for('register') }}">Sign up here</a>.</p>
+    {% endif %}
+{% endblock %}

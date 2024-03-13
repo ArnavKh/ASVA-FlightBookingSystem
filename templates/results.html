@@ -1,0 +1,56 @@
+{% extends "base1.html" %}
+
+{% block title %}Search Results for flights from {{ from_city }} to {{ to_city }}{% endblock %}
+
+{% block content %}
+    <div style="text-align: center;">
+        <h1>Search results</h1>
+        <p>Source: <b>{{ from_city }}</b></p>
+        <p>Destination: <b>{{ to_city }}</b></p>
+        <p>Date selected: <b>{{ dateoftrip }}, {{ dayofweek }}</b></p>
+
+        {% if list_of_results %}
+            <div class="results-table-container">
+                <table class="flight-table">
+                    <thead>
+                        <tr>
+                            <th>Origin</th>
+                            <th>Destination</th>
+                            <th>Flight Number</th>
+                            <th>Days of Week</th>
+                            <th>Departure Time</th>
+                            <th>Arrival Time</th>
+                            <th>Total Travel Time</th>
+                            <th>Rate</th>
+                            <th>Book Flight</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for flight in list_of_results %}
+                            <tr>
+                                <td>{{ flight.origin }}</td>
+                                <td>{{ flight.destination }}</td>
+                                <td>{{ flight.flightNumber }}</td>
+                                <td>{{ flight.daysOfWeek }}</td>
+                                <td>{{ flight.scheduledDepartureTime }}</td>
+                                <td>{{ flight.scheduledArrivalTime }}</td>
+                                <td>{{ flight.flightTime }}</td>
+                                <td>{{ flight.rate }}</td>
+                                <td>
+                                    <form action="https://example.com/booking" method="post" target="_blank">
+                                        <input type="hidden" name="flight_number" value="{{ flight.flightNumber }}">
+                                        <input type="submit" value="Book Now">
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div style="background-color: #ffe6e6; padding: 10px; border: 2px solid #ff6666; margin: 10px 0;">
+                <h1 style="color: #ff3333; font-size: 24px; font-weight: bold;">No results found.</h1>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

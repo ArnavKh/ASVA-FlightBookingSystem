@@ -1,0 +1,39 @@
+<!-- Save this file as 'book_flight.html' -->
+{% extends "base1.html" %}
+
+{% block title %}Book Flight{% endblock %}
+
+{% block content %}
+    <div style="text-align: center;">
+        <h1>Booking Details</h1>
+
+        {% if book_flight_record %}
+            <p>Flight Number: {{ book_flight_record.flightNumber }}</p>
+            <p>Departure: {{ book_flight_record.origin }}</p>
+            <p>Destination: {{ book_flight_record.destination }}</p>
+            <p>Date of Journey: {{ date_ }}</p>
+
+            <form method="post" action="{{ url_for('confirm_booking') }}">
+                <h2>Passenger Information</h2>
+                <label for="name">Name:</label>
+                <input type="text" name="name" required><br>
+
+                <label for="age">Age:</label>
+                <input type="number" name="age" required><br>
+
+                <label for="aadhaar">Aadhaar Card Number:</label>
+                <input type="text" name="aadhaar" required><br>
+
+                <label for="address">Address:</label>
+                <input type="text" name="address" required><br>
+
+                <!-- Include other passenger details as needed -->
+
+                <input type="hidden" name="flight_id" value="{{ book_flight_record._id }}">
+                <input type="submit" value="Confirm Booking">
+            </form>
+        {% else %}
+            <p>Flight not found.</p>
+        {% endif %}
+    </div>
+{% endblock %}
