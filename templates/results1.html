@@ -1,0 +1,60 @@
+<!-- Save this file as 'results.html' -->
+{% extends "base1.html" %}
+
+{% block title %}Search Results for flights from {{ from_city }} to {{ to_city }}{% endblock %}
+
+{% block content %}
+    <div style="text-align: center;">
+        <h1>Search results</h1>
+        <p>Source: <b>{{ from_city }}</b></p>
+        <p>Destination: <b>{{ to_city }}</b></p>
+        <p>Date selected: <b>{{ dateoftrip }}, {{ dayofweek }}</b></p>
+
+        {% if list_of_results %}
+            <div class="results-table-container">
+                <table class="flight-table" style="width: 00%; border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th class="bold-header">Object ID</th>
+                            <th class="bold-header">Origin</th>
+                            <th class="bold-header">Destination</th>
+                            <th class="bold-header">Flight Number</th>
+                            <th class="bold-header">Days of Week</th>
+                            <th class="bold-header">Departure Time</th>
+                            <th class="bold-header">Arrival Time</th>
+                            <th class="bold-header">Total Travel Time</th>
+                            <th class="bold-header">Rate</th>
+                            <th class="bold-header">Book Flight</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for flight in list_of_results %}
+                            <tr>
+                                <td style="width:'100%';">{{ flight._id }}</td>
+                                <td style="width:'100%';">{{ flight.origin }}</td>
+                                <td style="width:'100%';">{{ flight.destination }}</td>
+                                <td style="width:'100%';">{{ flight.flightNumber }}</td>
+                                <td style="width:'100%';">{{ flight.daysOfWeek }}</td>
+                                <td style="width:'100%';">{{ flight.scheduledDepartureTime }}</td>
+                                <td style="width:'100%';">{{ flight.scheduledArrivalTime }}</td>
+                                <td style="width:'100%';">{{ flight.flightTime }}</td>
+                                <td style="width:'100%';">{{ flight.rate }}</td>
+                                <!-- Button for booking each flight -->
+                                <td style="padding: 10px;">
+                                        <form action="{{ url_for('book_flight') }}" method="post">
+                                        <input type="hidden" name="obj_id" value="{{ flight._id }}">
+                                        <input type="submit" value="Book Now">
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div style="background-color: #ffe6e6; padding: 10px; border: 2px solid #ff6666; margin: 10px 0;">
+                <h1 style="color: #ff3333; font-size: 24px; font-weight: bold;">No results found.</h1>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

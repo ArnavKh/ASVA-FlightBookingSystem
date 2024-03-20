@@ -1,0 +1,32 @@
+<!-- Save this file as 'my_bookings.html' -->
+{% extends "base1.html" %}
+
+{% block title %}My Bookings{% endblock %}
+
+{% block content %}
+    <div style="text-align: center;">
+        <h1>My Bookings</h1>
+
+        {% if list_of_bookings %}
+            {% for booking_details in list_of_bookings %}
+                <div class="booking-details-container">
+                    <div class="booking-box">
+                        <h2>PNR ID: {{ booking_details.pnr_id }}</h2>
+                        <p>Flight Number: {{ booking_details.flight_details.flightNumber }}</p>
+                        <p>Origin: {{ booking_details.flight_details.origin }}</p>
+                        <p>Destination: {{ booking_details.flight_details.destination }}</p>
+                        <p>Passenger Name: {{ booking_details.passenger_details.name }}</p>
+                        <p>Age: {{ booking_details.passenger_details.age }}</p>
+                        <p>Aadhaar: {{ booking_details.passenger_details.aadhaar }}</p>
+                        <p>Address: {{ booking_details.passenger_details.address }}</p>
+                        <p>Journey Date: {{ booking_details.journey_date }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div style="background-color: #ffe6e6; padding: 10px; border: 2px solid #ff6666; margin: 10px 0;">
+                <h1 style="color: #ff3333; font-size: 24px; font-weight: bold;">No bookings found.</h1>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
