@@ -103,11 +103,14 @@ def user():
 
 
 
-
+# Page for opening profile
 @app.route('/profile_home/<email>', endpoint='profile_home')
 def profile_home(email):
+    # If logged in, open progile
     if 'email' in session and session['email'] == email:
         return render_template('index2.html', show_profile=True, email=email)
+    
+    # If not logged in return error
     else:
         flash('Invalid access to profile.')
         return redirect(url_for('login'))
@@ -118,7 +121,7 @@ def profile_home(email):
 
 
 
-
+# Logout page
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     # Remove current session
@@ -132,18 +135,21 @@ def logout():
 #Page for searching flights; source, destination and date fields
 @app.route('/flight_search', methods=('GET', 'POST'))
 def flight_search():
-    # Fetch available cities from MongoDB
+    # Fetch available cities (distinct) from MongoDB
     available_cities = cities_collection.distinct("origin")
+
 
     if request.method == 'POST':
         from_city = request.form['from']
         to_city = request.form['to']
         date_ = request.form['departure_date']
 
+        # If destination city is the same as source city (error)
         if from_city == to_city:
             flash('Source and destination cities cannot be the same. Please choose different cities.')
+        
+        # Store data in session variables
         else:
-            # Store data in session variables
             session['from_city'] = from_city
             session['to_city'] = to_city
             session['date_of_flight'] = date_  # Updated key to match the form
@@ -160,7 +166,7 @@ def flight_search():
 
 
 
-
+# Page for available flights after search
 @app.route('/results')
 def results():
     # Retrieve data from session variable
@@ -168,7 +174,7 @@ def results():
     to_city = session.get('to_city', '')
     date_ = session.get('date_of_flight', '')
 
-    # function to convert date to day of week format
+    # Function to convert date to day of week format
     date_object = datetime.strptime(date_, '%Y-%m-%d')
     dayofweek = date_object.strftime("%A")
 
@@ -213,14 +219,14 @@ def results():
 
 
 
-
+# Page for booking a flight
 @app.route('/book_flight', methods=['POST'])
 def book_flight():
     # Check if user is logged in
     if 'email' in session:
         obj_id = request.form.get('obj_id')
         obj_id = ObjectId(obj_id)
-
+# ??
         date_ = session.get('date_of_flight', '')
             
         # Find the document with the specified _id
@@ -238,13 +244,13 @@ def book_flight():
 
 
 
+# Page for flight booking confirmation
 @app.route('/confirm_booking', methods=['POST'])
 def confirm_booking():
     if request.method == 'POST':
-
-
         user_email = session.get('email', '')
         date_ = session.get('date_of_flight', '')
+        
         # Retrieve passenger information from the form submission
         name = request.form.get('name')
         age = request.form.get('age')
