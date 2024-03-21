@@ -264,6 +264,26 @@ def confirm_booking():
         # Generate a unique PNR ID
         pnr_id = secrets.token_urlsafe(8)  # You can adjust the length of the PNR ID
 
+<<<<<<< HEAD
+        # Create a dictionary with booking details, including the PNR ID
+        booking_dict = {
+            'pnr_id': pnr_id,
+            'flight_id': ObjectId(flight_id),
+            'flight_details': {
+                'flightNumber': book_flight_record['flightNumber'],
+                'origin': book_flight_record['origin'],
+                'destination': book_flight_record['destination']
+            },
+            'passenger_details': {
+                'name': name,
+                'age': age,
+                'aadhaar': aadhaar,
+                'address': address,
+                'email': user_email  # Add the user's email to the passenger details
+            },
+            'journey_date': date_
+        }
+=======
         # Create a dictionary with booking details, including the PNR ID
         booking_dict = {
             'pnr_id': pnr_id,
@@ -301,13 +321,64 @@ def confirm_booking():
 
 #Alpha function to test pagination of the result from the MongoDB database
 # -- NOT COMPLETE--
+>>>>>>> 2317d0d84bccbb7679a3ff49fabe83c5ee53d407
 
+<<<<<<< HEAD
+        # Insert the dictionary into the passenger collection
+        passenger_collection.insert_one(booking_dict)
+=======
+>>>>>>> 2317d0d84bccbb7679a3ff49fabe83c5ee53d407
 
+<<<<<<< HEAD
+        # Flash a success message with the PNR ID
+        flash(f'Booking confirmed! Your PNR ID is {pnr_id}. Flight details are available under "My Bookings".')
+=======
 def get_user_bookings(email):
     email = session.get('email', '')
     # Add your logic to fetch user bookings from MongoDB or any relevant data source
     # user_bookings = passenger_collection.find({'email': email})
     user_bookings = passenger_collection.find({"passenger_details.email":session.get('email','')})
+>>>>>>> 2317d0d84bccbb7679a3ff49fabe83c5ee53d407
+
+<<<<<<< HEAD
+        # Redirect to the home page or wherever you want
+        return redirect(url_for('index'))
+=======
+    # Convert the MongoDB cursor to a list for easier rendering in the template
+    list_of_bookings = list(user_bookings)
+>>>>>>> 2317d0d84bccbb7679a3ff49fabe83c5ee53d407
+
+<<<<<<< HEAD
+    return redirect(url_for('search_flight'))
+=======
+    return list_of_bookings
+>>>>>>> 2317d0d84bccbb7679a3ff49fabe83c5ee53d407
+
+<<<<<<< HEAD
+=======
+@app.route('/my_bookings', endpoint='my_bookings')
+def my_bookings():
+    # Add your logic to fetch user bookings or any relevant data
+    list_of_bookings = get_user_bookings(session.get('email', ''))
+    print()
+>>>>>>> 2317d0d84bccbb7679a3ff49fabe83c5ee53d407
+
+<<<<<<< HEAD
+=======
+    return render_template('my_bookings.html', list_of_bookings=list_of_bookings)
+>>>>>>> 2317d0d84bccbb7679a3ff49fabe83c5ee53d407
+
+
+
+
+#Alpha function to test pagination of the result from the MongoDB database
+# -- NOT COMPLETE--
+
+
+def get_user_bookings(email):
+    email = session.get('email', '')
+    # Add your logic to fetch user bookings from MongoDB or any relevant data source
+    user_bookings = passenger_collection.find({'email': email})
 
     # Convert the MongoDB cursor to a list for easier rendering in the template
     list_of_bookings = list(user_bookings)
@@ -320,25 +391,23 @@ def my_bookings():
     list_of_bookings = get_user_bookings(session.get('email', ''))
     print()
 
+<<<<<<< HEAD
     return render_template('my_bookings.html', list_of_bookings=list_of_bookings)
-
-
-
-
-
-
-
-
-
-
+=======
 @app.route("/get_pnr", methods=['GET'])
 def get_pnr():
     return render_template('get_pnr.html')
+>>>>>>> 2317d0d84bccbb7679a3ff49fabe83c5ee53d407
 
 @app.route("/get_pnr_details", methods=['POST'])
 def get_pnr_details():
     pnr_id = request.form['pnr_id']
 
+<<<<<<< HEAD
+
+
+
+=======
     # Assuming passenger_collection is your MongoDB collection object
     data = passenger_collection.find({"pnr_id": pnr_id})
 
@@ -362,5 +431,6 @@ if __name__ == '__main__':
 
 
 
+>>>>>>> 2317d0d84bccbb7679a3ff49fabe83c5ee53d407
 if __name__ == "__main__":
     app.run(debug=True)
