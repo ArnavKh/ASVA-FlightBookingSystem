@@ -34,5 +34,11 @@
             document.getElementById('departure-date').setAttribute('min', today);
             return true;
         }
+
+        // Get today's date in the format YYYY-MM-DD
+        var today = new Date().toISOString().split('T')[0];
+        
+        // Set the minimum date for the date input to today
+        document.getElementById("departure-date").min = today;
     </script>
 {% endblock %}

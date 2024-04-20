@@ -12,6 +12,12 @@
                     <label for="exampleInputPassword1">Password</label>
                     <input type="password" name="password" placeholder="Password">
                 </div>
+
+                <div>
+                    <h2>Enter the CAPTCHA below:</h2>
+                    <p>CAPTCHA: {{ captcha }}</p>
+                    <input type="text" name="captcha_input" placeholder="Enter CAPTCHA">
+                </div>
                 <button type="submit">Register</button>
             </form>
             <br>

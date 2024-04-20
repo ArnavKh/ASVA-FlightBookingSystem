@@ -16,6 +16,14 @@
             <p>Day of Week: {{ dayofweek }}</p>
 
             <h2>Available Flights</h2>
+            <p>Filters</p>
+            <form action="/results" method="GET">
+                <button type="submit" name="sort" value="price_asc">Sort by Price (Ascending)</button>
+                <button type="submit" name="sort" value="price_desc">Sort by Price (Descending)</button>
+                <button type="submit" name="sort" value="duration_asc">Sort by Duration (Ascending)</button>
+                <button type="submit" name="sort" value="duration_desc">Sort by Duration (Descending)</button>
+                <button type="submit" name="sort" value="departure">Sort by Departure Time</button>
+            </form>
             <div class="results-table-container">
                 <table class="flight-table" style="width: 100%; border-collapse: collapse;">
                     <thead>

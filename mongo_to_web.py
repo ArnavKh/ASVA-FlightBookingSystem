@@ -1,11 +1,15 @@
 from flask import Flask, render_template, request, flash, redirect, url_for, session
 from pymongo import MongoClient
+from pymongo import ASCENDING, DESCENDING
 from bson.objectid import ObjectId
 from flask_paginate import Pagination
 from datetime import datetime
 import bcrypt
 import time
 import secrets
+import re
+import random
+import string
 
 
 
@@ -46,6 +50,7 @@ def index():
 
 
 
+# Route for displaying the login form with CAPTCHA
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     # If user has entered information in the login form
@@ -53,39 +58,79 @@ def login():
         email = request.form['email']  # Change 'username' to 'email'
         login_user = users_collection.find_one({'email': email})
 
+        # Get the form data including the CAPTCHA input
+        captcha_input = request.form['captcha_input']
+        
+        # Get the CAPTCHA stored in the session
+        captcha_session = session.get('captcha', '')
+
         # If a matching email is found
         if login_user:
-            # If password is correct
-            if bcrypt.checkpw(request.form['password'].encode('utf-8'), login_user['password']):
+            # Check if the input matches the CAPTCHA stored in the session
+            if captcha_input.upper() != captcha_session:
+                return 'CAPTCHA Incorrect! Please try again.'
+
+            # If password is correct and CAPTCHA is valid
+            if (bcrypt.checkpw(request.form['password'].encode('utf-8'), login_user['password'])) and (captcha_input.upper() == captcha_session):
                 session['email'] = email  # Set the user's email in the session
                 return redirect('/loggedin')
+            
 
-        flash('Invalid email/password. Please try again.', 'error')
+    # Generate a new CAPTCHA string and store it in the session
+    captcha_string = generate_captcha()
+    session['captcha'] = captcha_string
 
-    return render_template('login.html')
+    # Render the login form with CAPTCHA
+    return render_template('login.html', captcha=captcha_string)
 
 
 
+# Route for displaying the registration form with CAPTCHA
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    # If user has entered information in the registration form
     if request.method == 'POST':
-        existing_user = users_collection.find_one({'email': request.form['email']})  # Change 'username' to 'email'
+        # Get the form data
+        email = request.form['email']
+        password = request.form['password']
+        captcha_input = request.form['captcha_input']
+        
+        # Get the CAPTCHA stored in the session
+        captcha_session = session.get('captcha', '')
+        
+        # Check if the input matches the CAPTCHA stored in the session
+        if captcha_input.upper() != captcha_session:
+            return 'CAPTCHA Incorrect! Please try again.'
+        
+        # Check if the email already exists in the database
+        existing_user = users_collection.find_one({'email': email})
+        if existing_user:
+            return 'Email already exists'
+        
+        # Password validation using regular expression
+        if not re.match(r"^(?=.*[A-Z])(?=.*[!@#$%^&*()_+}{:;'?/>.<,])(?=.*[a-z]).{5,}$", password):
+            return 'Password must contain at least 1 symbol, 1 capital letter, and be at least 5 characters long.'
+        
+        # Encrypting entered password
+        hashpass = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        
+        # Inserting given information into DB with email
+        users_collection.insert_one({'email': email, 'password': hashpass})
+        
+        return redirect('/login')
+    
+    else:
+        # Generate a new CAPTCHA string and store it in the session
+        captcha_string = generate_captcha()
+        session['captcha'] = captcha_string
+        
+        # Render the registration form with CAPTCHA
+        return render_template('register.html', captcha=captcha_string)
 
-        # If entered data is not found in the DB
-        if existing_user is None:
-            # Encrypting entered password
-            hashpass = bcrypt.hashpw(request.form['password'].encode('utf-8'), bcrypt.gensalt())
-            # Inserting given information into DB with email
-            users_collection.insert_one({'email': request.form['email'], 'password': hashpass})
 
-            return redirect('/login')
-
-        return 'Email already exists'
-
-    return render_template('register.html')
-
-
+# Generate a random CAPTCHA string
+def generate_captcha():
+    captcha_string = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    return captcha_string
 
 
 
@@ -103,14 +148,11 @@ def user():
 
 
 
-# Page for opening profile
+
 @app.route('/profile_home/<email>', endpoint='profile_home')
 def profile_home(email):
-    # If logged in, open progile
     if 'email' in session and session['email'] == email:
         return render_template('index2.html', show_profile=True, email=email)
-    
-    # If not logged in return error
     else:
         flash('Invalid access to profile.')
         return redirect(url_for('login'))
@@ -118,10 +160,6 @@ def profile_home(email):
 
 
 
-
-
-
-# Logout page
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     # Remove current session
@@ -130,26 +168,21 @@ def logout():
 
 
 
-
-
 #Page for searching flights; source, destination and date fields
 @app.route('/flight_search', methods=('GET', 'POST'))
 def flight_search():
-    # Fetch available cities (distinct) from MongoDB
+    # Fetch available cities from MongoDB
     available_cities = cities_collection.distinct("origin")
-
 
     if request.method == 'POST':
         from_city = request.form['from']
         to_city = request.form['to']
         date_ = request.form['departure_date']
 
-        # If destination city is the same as source city (error)
         if from_city == to_city:
             flash('Source and destination cities cannot be the same. Please choose different cities.')
-        
-        # Store data in session variables
         else:
+            # Store data in session variables
             session['from_city'] = from_city
             session['to_city'] = to_city
             session['date_of_flight'] = date_  # Updated key to match the form
@@ -159,14 +192,6 @@ def flight_search():
 
 
 
-
-
-
-
-
-
-
-# Page for available flights after search
 @app.route('/results')
 def results():
     # Retrieve data from session variable
@@ -174,7 +199,7 @@ def results():
     to_city = session.get('to_city', '')
     date_ = session.get('date_of_flight', '')
 
-    # Function to convert date to day of week format
+    # function to convert date to day of week format
     date_object = datetime.strptime(date_, '%Y-%m-%d')
     dayofweek = date_object.strftime("%A")
 
@@ -196,28 +221,46 @@ def results():
         }
     )
 
+    # Check if sorting by price is requested
+    sort_by = request.args.get('sort')
+    if sort_by == 'price_asc':
+        wanted_cities.sort("rate", ASCENDING)
+    elif sort_by == 'price_desc':
+        wanted_cities.sort("rate", DESCENDING)
+    elif sort_by == 'duration_asc':
+        wanted_cities.sort("flightTime", ASCENDING)
+    elif sort_by == 'duration_desc':
+        wanted_cities.sort("flightTime", DESCENDING)
+    elif sort_by == 'departure':
+        wanted_cities.sort("scheduledDepartureTime", ASCENDING)
+        
+
     list_of_results = list(wanted_cities)
     flag = bool(list_of_results)  # Simplify the flag assignment
 
     # Check if user is logged in using email
-    if 'email' in session:
-        return render_template('results11.html', list_of_results=list_of_results, from_city=from_city, to_city=to_city,
+    # if 'email' in session:
+    return render_template('results11.html', list_of_results=list_of_results, from_city=from_city, to_city=to_city,
                                flag=flag, dateoftrip=date_, dayofweek=dayofweek)
-    else:
+    # else:
         # User is not logged in, redirect to login page
-        flash('Please log in to proceed.')
-        return redirect(url_for('login'))
+        # flash('Please log in to proceed.')
+        # return redirect(url_for('login'))
 
 
 
 
-
-
-
-
-
-
-
+#Surab Sebait
+# Function to book a flight and update seat availability
+def book_flights(flight_id, booking_date):
+    cities_collection.update_one(
+        {"_id": ObjectId(flight_id), "instances.{}".format(booking_date): {"$exists": False}},
+        {"$set": {"instances.{}".format(booking_date): {"seatAvail": 180}}}
+    )
+    cities_collection.update_one(
+        {"_id": ObjectId(flight_id), "instances.{}.seatAvail".format(booking_date): {"$exists": True}},
+        {"$inc": {"instances.{}.seatAvail".format(booking_date): -1}}
+    )
 
 # Page for booking a flight
 @app.route('/book_flight', methods=['POST'])
@@ -226,9 +269,10 @@ def book_flight():
     if 'email' in session:
         obj_id = request.form.get('obj_id')
         obj_id = ObjectId(obj_id)
-# ??
+
+        # Retrieve the date of flight from the session
         date_ = session.get('date_of_flight', '')
-            
+
         # Find the document with the specified _id
         book_flight_record = cities_collection.find_one({'_id': obj_id})
 
@@ -241,8 +285,6 @@ def book_flight():
     else:
         # User is not logged in, redirect to login page
         return redirect(url_for('login'))
-
-
 
 # Page for flight booking confirmation
 @app.route('/confirm_booking', methods=['POST'])
@@ -264,26 +306,6 @@ def confirm_booking():
         # Generate a unique PNR ID
         pnr_id = secrets.token_urlsafe(8)  # You can adjust the length of the PNR ID
 
-<<<<<<< HEAD
-        # Create a dictionary with booking details, including the PNR ID
-        booking_dict = {
-            'pnr_id': pnr_id,
-            'flight_id': ObjectId(flight_id),
-            'flight_details': {
-                'flightNumber': book_flight_record['flightNumber'],
-                'origin': book_flight_record['origin'],
-                'destination': book_flight_record['destination']
-            },
-            'passenger_details': {
-                'name': name,
-                'age': age,
-                'aadhaar': aadhaar,
-                'address': address,
-                'email': user_email  # Add the user's email to the passenger details
-            },
-            'journey_date': date_
-        }
-=======
         # Create a dictionary with booking details, including the PNR ID
         booking_dict = {
             'pnr_id': pnr_id,
@@ -305,6 +327,9 @@ def confirm_booking():
 
         # Insert the dictionary into the passenger collection
         passenger_collection.insert_one(booking_dict)
+
+        # Update seat availability in the cities collection
+        book_flights(flight_id, date_)
 
         # Flash a success message with the PNR ID
         flash(f'Booking confirmed! Your PNR ID is {pnr_id}. Flight details are available under "My Bookings".')
@@ -317,68 +342,15 @@ def confirm_booking():
 
 
 
-
-
 #Alpha function to test pagination of the result from the MongoDB database
 # -- NOT COMPLETE--
->>>>>>> 2317d0d84bccbb7679a3ff49fabe83c5ee53d407
 
-<<<<<<< HEAD
-        # Insert the dictionary into the passenger collection
-        passenger_collection.insert_one(booking_dict)
-=======
->>>>>>> 2317d0d84bccbb7679a3ff49fabe83c5ee53d407
 
-<<<<<<< HEAD
-        # Flash a success message with the PNR ID
-        flash(f'Booking confirmed! Your PNR ID is {pnr_id}. Flight details are available under "My Bookings".')
-=======
 def get_user_bookings(email):
     email = session.get('email', '')
     # Add your logic to fetch user bookings from MongoDB or any relevant data source
     # user_bookings = passenger_collection.find({'email': email})
     user_bookings = passenger_collection.find({"passenger_details.email":session.get('email','')})
->>>>>>> 2317d0d84bccbb7679a3ff49fabe83c5ee53d407
-
-<<<<<<< HEAD
-        # Redirect to the home page or wherever you want
-        return redirect(url_for('index'))
-=======
-    # Convert the MongoDB cursor to a list for easier rendering in the template
-    list_of_bookings = list(user_bookings)
->>>>>>> 2317d0d84bccbb7679a3ff49fabe83c5ee53d407
-
-<<<<<<< HEAD
-    return redirect(url_for('search_flight'))
-=======
-    return list_of_bookings
->>>>>>> 2317d0d84bccbb7679a3ff49fabe83c5ee53d407
-
-<<<<<<< HEAD
-=======
-@app.route('/my_bookings', endpoint='my_bookings')
-def my_bookings():
-    # Add your logic to fetch user bookings or any relevant data
-    list_of_bookings = get_user_bookings(session.get('email', ''))
-    print()
->>>>>>> 2317d0d84bccbb7679a3ff49fabe83c5ee53d407
-
-<<<<<<< HEAD
-=======
-    return render_template('my_bookings.html', list_of_bookings=list_of_bookings)
->>>>>>> 2317d0d84bccbb7679a3ff49fabe83c5ee53d407
-
-
-
-
-#Alpha function to test pagination of the result from the MongoDB database
-# -- NOT COMPLETE--
-
-
-def get_user_bookings(email):
-    email = session.get('email', '')
-    # Add your logic to fetch user bookings from MongoDB or any relevant data source
-    user_bookings = passenger_collection.find({'email': email})
 
     # Convert the MongoDB cursor to a list for easier rendering in the template
     list_of_bookings = list(user_bookings)
@@ -391,23 +363,18 @@ def my_bookings():
     list_of_bookings = get_user_bookings(session.get('email', ''))
     print()
 
-<<<<<<< HEAD
     return render_template('my_bookings.html', list_of_bookings=list_of_bookings)
-=======
+
+
+
 @app.route("/get_pnr", methods=['GET'])
 def get_pnr():
     return render_template('get_pnr.html')
->>>>>>> 2317d0d84bccbb7679a3ff49fabe83c5ee53d407
 
 @app.route("/get_pnr_details", methods=['POST'])
 def get_pnr_details():
     pnr_id = request.form['pnr_id']
 
-<<<<<<< HEAD
-
-
-
-=======
     # Assuming passenger_collection is your MongoDB collection object
     data = passenger_collection.find({"pnr_id": pnr_id})
 
@@ -424,13 +391,4 @@ def get_pnr_details():
         return "PNR not found"  # You can return an error message or handle it as per your application logic
 
 if __name__ == '__main__':
-    app.run(debug=True)
-
-
-
-
-
-
->>>>>>> 2317d0d84bccbb7679a3ff49fabe83c5ee53d407
-if __name__ == "__main__":
     app.run(debug=True)
