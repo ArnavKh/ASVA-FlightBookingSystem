@@ -60,6 +60,58 @@
         .flight-table tbody tr:hover {
             background-color: #f5f5f5;
         }
+                nav {
+            overflow: hidden;
+            background-color: #f2f2f2;
+            padding: 10px 20px;
+        }
+        
+        .nav-links {
+            float: left;
+            width: 60%;
+        }
+        
+        .nav-links a {
+            float: left;
+            display: block;
+            color: #417fd6;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+        
+        .user-options {
+            float: right;
+            width: 40%;
+        }
+        
+        .user-options a {
+            float: right;
+            display: block;
+            color: #417fd6;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+        
+        @media screen and (max-width: 768px) {
+            .nav-links, .user-options {
+                float: none;
+                width: 100%;
+            }
+        }
+        
+        
+        .option {
+            display: inline-block;
+            margin: 20px;
+        }
+
+        .options-wrapper {
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -67,6 +119,8 @@
         <a href="{{ url_for('index') }}">Home</a>
         <a href="{{ url_for('flight_search') }}">Search Flights</a>
         <a href="{{ url_for('get_pnr') }}">Get PNR Details</a>
+        <a href="{{ url_for('data_analysis') }}">Data Analysis</a>
+		<a href="{{ url_for('cancel_flight') }}">Cancel Flight</a>
         <div class="user-options">
             <a href="{{ url_for('profile_home', email=session['email']) }}">Profile</a>
             <a href="{{ url_for('my_bookings') }}">My Bookings</a>

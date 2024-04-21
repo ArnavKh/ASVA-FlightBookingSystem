@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %} {% endblock %} - FlaskApp</title>
+    <style>
+        /* Your existing styles here */
+
+        nav a {
+            color: #417fd6;
+            font-size: 3em;
+            margin-left: 50px;
+            text-decoration: none;
+        }
+
+        .user-options {
+            float: right;
+            margin-right: 20px;
+        }
+
+        .user-options a {
+            margin-left: 20px;
+        }
+
+
+        nav a {
+            color: #417fd6;
+            font-size: 3em;
+            margin-left: 50px;
+            text-decoration: none;
+        }
+
+        .user-options {
+            float: right;
+            margin-right: 20px;
+        }
+
+        .user-options a {
+            margin-left: 20px;
+        }
+
+        /* Add the new styles here */
+        .flight-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            border: 1px solid #ddd; /* Add this line to set border */
+        }
+
+        .flight-table th, .flight-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .flight-table th {
+            background-color: #f2f2f2;
+        }
+
+        .flight-table tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+                nav {
+            overflow: hidden;
+            background-color: #f2f2f2;
+            padding: 10px 20px;
+        }
+        
+        .nav-links {
+            float: left;
+            width: 60%;
+        }
+        
+        .nav-links a {
+            float: left;
+            display: block;
+            color: #417fd6;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+        
+        .user-options {
+            float: right;
+            width: 40%;
+        }
+        
+        .user-options a {
+            float: right;
+            display: block;
+            color: #417fd6;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+        
+        @media screen and (max-width: 768px) {
+            .nav-links, .user-options {
+                float: none;
+                width: 100%;
+            }
+        }
+        
+        
+        .option {
+            display: inline-block;
+            margin: 20px;
+        }
+
+        .options-wrapper {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('flight_search') }}">Search Flights</a>
+        <a href="{{ url_for('get_pnr') }}">Get PNR Details</a>
+        <a href="{{ url_for('data_analysis') }}">Data Analysis</a>
+		<a href="{{ url_for('cancel_flight') }}">Cancel Flight</a>
+        <div class="user-options">
+            <a href="{{ url_for('profile_home', email=session['email']) }}">Profile</a>
+            <a href="{{ url_for('my_bookings') }}">My Bookings</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </nav>
+    <hr>
+    <div class="content">
+        {% for message in get_flashed_messages() %}
+            <div class="alert">{{ message }}</div>
+        {% endfor %}
+        {% block content %} {% endblock %}
+    </div>
+</body>
+</html>

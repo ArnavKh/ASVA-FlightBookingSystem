@@ -1,0 +1,36 @@
+<!-- index2.html -->
+{% extends "base1.html" %}
+
+{% block title %}Data Analysis Options{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1>Data Analysis Options</h1>
+  <div class="options-wrapper">
+    <div class="option">
+      <a href="mean_airfare_distribution"><img src="static/images/image1.jpg" alt="Option 1"></a>
+      <p>Average Airfare per Airline Distribution</p> 
+      <br>
+      <button onclick="window.location.href='mean_airfare_distribution'">Option 1</button>
+    </div>
+    <div class="option">
+      <a href="flight_time_distribution"><img src="static/images/image2.jpg" alt="Option 2"></a>
+      <p>Distribution of flight time</p> 
+      <br>
+      <button onclick="window.location.href='/flight_time_distribution'">Option 2</button>
+    </div>
+    <div class="option">
+      <a href="city_selection"><img src="static/images/image3.jpg" alt="Option 3"></a>
+      <p>Departure time distribution (Custom city selection)</p>
+      <br>
+      <button onclick="window.location.href='/city_selection'">Option 3</button>
+    </div>
+    <div class="option">
+      <a href="pie_chart"><img src="static/images/image4.jpg" alt="Option 4"></a>
+      <p>No. of flights per airline</p> 
+      <br>
+      <button onclick="window.location.href='/pie_chart'">Option 4</button>
+    </div>
+  </div>
+</div>
+{% endblock %}

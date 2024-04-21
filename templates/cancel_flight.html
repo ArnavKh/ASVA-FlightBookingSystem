@@ -1,0 +1,16 @@
+{% extends "base1.html" %}
+
+{% block title %}Flight Cancelation{% endblock %}
+
+{% block content %}
+    <h1>Cancel Your Flight</h1>
+    
+    <div style="margin-top: 20px; text-align: center;">
+        <form action="/cancel_flight_user" method="POST">
+            <label for="pnr_id">Enter PNR ID:</label><br>
+            <input type="text" id="pnr_id" name="pnr_id" required><br><br>
+
+            <button type="submit">Cancel Flight</button>
+        </form>
+    </div>
+{% endblock %}
