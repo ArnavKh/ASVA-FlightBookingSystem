@@ -437,31 +437,30 @@ def cancel_flight_user():
 
 
 
-
-
-
 @app.route("/get_pnr", methods=['GET'])
 def get_pnr():
-    return render_template('get_pnr.html')
+    return render_template('get_pnr.html', error_message=None)
 
 @app.route("/get_pnr_details", methods=['POST'])
 def get_pnr_details():
     pnr_id = request.form['pnr_id']
 
     # Assuming passenger_collection is your MongoDB collection object
-    data = passenger_collection.find({"pnr_id": pnr_id})
+    data = passenger_collection.find_one({"pnr_id": pnr_id})
 
     if data:
         pnr_data = {
-            'pnr_id': data[0]['pnr_id'],
-            'flight_number': data[0]['flight_details']['flightNumber'],
-            'origin': data[0]['flight_details']['origin'],
-            'destination': data[0]['flight_details']['destination'],
-            'journey_date': data[0]['journey_date']
+            'pnr_id': data['pnr_id'],
+            'flight_number': data['flight_details']['flightNumber'],
+            'origin': data['flight_details']['origin'],
+            'destination': data['flight_details']['destination'],
+            'journey_date': data['journey_date']
         }
-        return render_template('get_pnr.html', pnr_data=pnr_data)
+        return render_template('get_pnr.html', pnr_data=pnr_data, error_message=None)
     else:
-        return "PNR not found"  # You can return an error message or handle it as per your application logic
+        error_message = "PNR not found"
+        return render_template('get_pnr.html', error_message=error_message)
+
 
 
 
