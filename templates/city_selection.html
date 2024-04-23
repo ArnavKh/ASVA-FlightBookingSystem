@@ -1,0 +1,18 @@
+{% extends "base1.html" %}
+
+{% block title %}City Selection{% endblock %}
+
+{% block content %}
+    <h1>City Selection</h1>
+
+    <form action="/city_selection" method="post">
+        <label for="city">Select a city:</label>
+        <select name="city" id="city">
+            {% for city in avail_cities %}
+                <option value="{{ city }}">{{ city }}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+        <input type="submit" value="Submit">
+    </form>
+{% endblock %}
