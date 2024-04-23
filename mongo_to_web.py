@@ -16,11 +16,16 @@ import string
 import io
 import base64
 import json
+import jsonify
 import plotly
 import plotly.express as px
 import plotly.io as pio
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
 
 
+nltk.data.path.append("/path/to/nltk_data")
 
 
 
@@ -55,6 +60,92 @@ def index():
     else:
         # User is not logged in, show login link
         return render_template("index2.html", show_login=True)
+
+
+nltk.download('punkt')   #For tokenization
+nltk.download('stopwords')  #For removing the commonly used term(like 'and','is','was','they',etc.)
+
+# Path to the data file
+data=pd.read_csv("/Users/vaidat/Flight-Booking/Flight_Booking_System.flights.csv")
+
+def preprocess_text(text):
+    stop_words = set(stopwords.words('english'))
+    tokens = word_tokenize(text)
+    sample = tokens
+    tokens = [word.lower() for word in tokens if word.isalpha() and word not in stop_words]
+    if "from" in sample:
+        tokens.append('from')
+    if "to" in sample:
+        tokens.append('to')
+    if "where" in sample:
+        tokens.append('where')
+    if "which" in sample:
+        tokens.append('which')
+    if "how" in sample:
+        tokens.append('how')
+    if "time" in sample:
+        tokens.append("time")
+    if "long" in sample:
+        tokens.append("long")
+    return tokens
+
+def check_flight_id(flight_id, data):
+    return flight_id in data['_id'].values
+
+def handle_specific_query(flight_id, query, data):
+    tokens = preprocess_text(query)
+    flight_info = data[data['_id'] == flight_id].iloc[0]
+    if any(word in tokens for word in ['airline', 'which airline', 'airlines', 'which airlines']):
+        return f"The airline is {flight_info['airline']}."
+    elif any(word in tokens for word in ['flight no', 'flight number', 'number']):
+        return f"The flight number is {flight_info['flightNumber']}."
+    elif any(word in tokens for word in ['source', 'depart', 'departing', 'from', 'coming', 'heading from', 'origin']):
+        return f"The flight origin is {flight_info['origin']}."
+    elif any(word in tokens for word in ['destination', 'landing', 'arrive', 'land', 'arrival', 'going', 'to', 'arriving']):
+        return f"The flight destination is {flight_info['destination']}."
+    elif any(word in tokens for word in ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']):
+        days_of_week = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+        found_day = None
+        for day in days_of_week:
+            if day in tokens:
+                found_day = day
+                break
+        if found_day is not None:
+            if flight_info[found_day.capitalize()] == 'Y':
+                return f"Yes, this flight flies on {found_day.capitalize()}."
+            else:
+                return f"No, this flight doesn't fly on {found_day.capitalize()}."
+        else:
+            return "Day of the week not recognized in query."
+    elif any(word in tokens for word in ['weekend', 'weekends']):
+        if flight_info['Saturday'] == 'Y' or flight_info['Sunday'] == 'Y':
+            return "Yes, this flight flies on the weekends."
+        else:
+            return "No, this flight doesn't fly on the weekends."
+    elif any(word in tokens for word in ['weekday', 'weekdays']):
+        if flight_info['Monday'] == 'Y' or flight_info['Tuesday'] == 'Y' or flight_info['Wednesday'] == 'Y' or flight_info['Thursday'] == 'Y' or flight_info['Friday'] == 'N':
+            return "Yes, this flight flies on the weekdays."
+        else:
+            return "No, this flight doesn't fly on the weekdays."
+    elif any(word in tokens for word in ['scheduledDepartureTime', 'departure']):
+        return f"The scheduled departure time is {flight_info['scheduledDepartureTime']}."
+    elif any(word in tokens for word in ['scheduledArrivalTime', 'arrival']):
+        return f"The scheduled arrival time is {flight_info['scheduledArrivalTime']}."
+    elif any(word in tokens for word in ['flighttime', 'time', 'long', 'duration']):
+        if 'long' in tokens or 'time' or 'duration' in tokens:
+            return f"The flight time in hours is {flight_info['flightTime']}."
+        else:
+            return "You can ask about the airline, flight number, origin, destination, operation days, scheduled times, flight time, rate, or seat availability."
+    elif any(word in tokens for word in ['rate', 'price']):
+        return f"The rate/price of the flight is {flight_info['rate']}."
+    elif any(word in tokens for word in ['seats', 'available', 'avail']):
+        return f"There are {flight_info['seatAvail']} seats available."
+    else:
+        return "You can ask about the airline, flight number, origin, destination, operation days, scheduled times, flight time, rate, or seat availability."
+
+# List to store conversation history
+conversation_history = []
+flight_id_asked = False
 
 
 
@@ -144,8 +235,6 @@ def generate_captcha():
 
 
 
-
-
 @app.route('/loggedin')
 def user():
     # If user is logged in (in session)
@@ -172,17 +261,11 @@ def profile_home(email):
 
 
 
-
-
-
-
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     # Remove current session
     session.pop('email', None)
     return redirect('/')
-
-
 
 
 
@@ -259,7 +342,6 @@ def results():
         wanted_cities.sort("flightTime", DESCENDING)
     elif sort_by == 'departure':
         wanted_cities.sort("scheduledDepartureTime", ASCENDING)
-        
 
     list_of_results = list(wanted_cities)
     flag = bool(list_of_results)  # Simplify the flag assignment
@@ -267,11 +349,16 @@ def results():
     # Check if user is logged in using email
     # if 'email' in session:
     return render_template('results11.html', list_of_results=list_of_results, from_city=from_city, to_city=to_city,
-                               flag=flag, dateoftrip=date_, dayofweek=dayofweek)
+                           flag=flag, dateoftrip=date_, dayofweek=dayofweek)
     # else:
-        # User is not logged in, redirect to login page
-        # flash('Please log in to proceed.')
-        # return redirect(url_for('login'))
+    # User is not logged in, redirect to login page
+    # flash('Please log in to proceed.')
+    # return redirect(url_for('login'))
+
+
+
+
+
 
 
 
@@ -287,8 +374,6 @@ def book_flights(flight_id, booking_date):
         {"_id": ObjectId(flight_id), "instances.{}.seatAvail".format(booking_date): {"$exists": True}},
         {"$inc": {"instances.{}.seatAvail".format(booking_date): -1}}
     )
-
-
 
 # Page for booking a flight
 @app.route('/book_flight', methods=['POST'])
@@ -314,6 +399,10 @@ def book_flight():
         # User is not logged in, redirect to login page
         return redirect(url_for('login'))
 
+
+
+
+
 # Page for flight booking confirmation
 @app.route('/confirm_booking', methods=['POST'])
 def confirm_booking():
@@ -328,8 +417,27 @@ def confirm_booking():
         address = request.form.get('address')
         flight_id = request.form.get('flight_id')
 
+        # Validate age
+        try:
+            age = int(age)
+            if not 0 <= age <= 100:
+                raise ValueError("Age must be between 0 and 100.")
+        except ValueError:
+            error_message = "Age must be a valid integer between 0 and 100."
+            return render_template('confirm_booking.html', error_message=error_message)
+
+        # Check Aadhaar ID format using regex
+        if not re.match(r'^\d{12}$', aadhaar):
+            error_message = 'Aadhaar ID must be exactly 12 digits.'
+            return render_template('confirm_booking.html', error_message=error_message)
+
         # Retrieve flight details from the database using the flight_id
         book_flight_record = cities_collection.find_one({'_id': ObjectId(flight_id)})
+
+        # Check if flight record exists
+        if not book_flight_record:
+            error_message = 'Flight not found.'
+            return render_template('confirm_booking.html', error_message=error_message)
 
         # Generate a unique PNR ID
         pnr_id = secrets.token_urlsafe(8)  # You can adjust the length of the PNR ID
@@ -341,14 +449,18 @@ def confirm_booking():
             'flight_details': {
                 'flightNumber': book_flight_record['flightNumber'],
                 'origin': book_flight_record['origin'],
-                'destination': book_flight_record['destination']
+                'destination': book_flight_record['destination'],
+                'departure_time': book_flight_record['scheduledDepartureTime'],
+                'arrival_time': book_flight_record['scheduledArrivalTime']
             },
             'passenger_details': {
                 'name': name,
                 'age': age,
                 'aadhaar': aadhaar,
                 'address': address,
-                'email': user_email  # Add the user's email to the passenger details
+                'email': user_email,  # Add the user's email to the passenger details
+                'departure_time': book_flight_record['scheduledDepartureTime'],  # Include departure time in passenger details
+                'arrival_time': book_flight_record['scheduledArrivalTime']  # Include arrival time in passenger details
             },
             'journey_date': date_
         }
@@ -369,13 +481,6 @@ def confirm_booking():
 
 
 
-
-
-
-#Alpha function to test pagination of the result from the MongoDB database
-# -- NOT COMPLETE--
-
-
 def get_user_bookings(email):
     email = session.get('email', '')
     # Add your logic to fetch user bookings from MongoDB or any relevant data source
@@ -390,7 +495,7 @@ def get_user_bookings(email):
 @app.route('/my_bookings', endpoint='my_bookings')
 def my_bookings():
     # Add your logic to fetch user bookings or any relevant data
-    list_of_bookings = get_user_bookings(session.get('email', ''))
+    list_of_bookings = get_user_bookings(session.get('email', ''))  
     print()
 
     return render_template('my_bookings.html', list_of_bookings=list_of_bookings)
@@ -434,9 +539,7 @@ def cancel_flight_user():
     return redirect(url_for('index'))
 
 
-
-
-
+# Get PNR details
 @app.route("/get_pnr", methods=['GET'])
 def get_pnr():
     return render_template('get_pnr.html', error_message=None)
@@ -445,24 +548,24 @@ def get_pnr():
 def get_pnr_details():
     pnr_id = request.form['pnr_id']
 
-    # Assuming passenger_collection is your MongoDB collection object
+    # Retrieve PNR details from the database using the PNR ID
     data = passenger_collection.find_one({"pnr_id": pnr_id})
 
     if data:
+        # Extract relevant details from the data
         pnr_data = {
             'pnr_id': data['pnr_id'],
             'flight_number': data['flight_details']['flightNumber'],
             'origin': data['flight_details']['origin'],
             'destination': data['flight_details']['destination'],
-            'journey_date': data['journey_date']
+            'journey_date': data['journey_date'],
+            'departure_time': data['flight_details'].get('departure_time', 'N/A'),
+            'arrival_time': data['flight_details'].get('arrival_time', 'N/A')
         }
         return render_template('get_pnr.html', pnr_data=pnr_data, error_message=None)
     else:
         error_message = "PNR not found"
         return render_template('get_pnr.html', error_message=error_message)
-
-
-
 
 
 
@@ -620,8 +723,51 @@ def airline_distribution():
     # Use render_template to pass graphJSON to html
     return render_template('bar3_plot.html', graphJSON=graphJSON)
 
+@app.route('/chatbot1', methods=['GET'])
+def chatbot1():
+    global conversation_history
+    conversation_history.append({'system': "Please enter the flight ID you're interested in:"})
+    return render_template('chatbot1.html', conversation=conversation_history)
+    
 
 
+@app.route('/chat', methods=['POST'])
+def chat():
+    global conversation_history
+    global flight_id_asked
+    global verified_flight_id
+
+    # Get user input from the form
+    user_input = request.form['user_input']
+    
+    if not flight_id_asked:
+        # Check if flight ID is valid
+        if check_flight_id(user_input, data):
+            verified_flight_id = user_input  # Store the verified flight ID
+            conversation_history.append({'user': user_input})
+            conversation_history.append({'system': "Flight ID recognized. You can now ask specific questions about this flight."})
+            flight_id_asked = True
+            conversation_history.append({'system': "Ask me about the source, destination, flight minutes, rate, or days of operation (or type 'quit' to exit): "})
+        else:
+            conversation_history.append({'user': user_input})
+            conversation_history.append({'system': "Invalid flight ID. Please enter a valid flight ID."})
+        return render_template('chatbot1.html', conversation=conversation_history)
+    else:
+        if user_input.lower() == 'quit':
+            conversation_history.append({'user': user_input})
+            conversation_history.append({'system': "Chat ended. Goodbye!"})
+            return render_template('chatbot1.html', conversation=conversation_history)
+        
+        # Handle specific queries about the flight
+        user_query = user_input
+        if not check_flight_id(verified_flight_id, data):  # Check if the verified flight ID still exists in the data
+            conversation_history.append({'user': user_query})
+            conversation_history.append({'system': "Invalid flight ID. Please enter a valid flight ID."})
+            return render_template('chatbot1.html', conversation=conversation_history)
+        response = handle_specific_query(verified_flight_id, user_query, data)
+        conversation_history.append({'user': user_query})
+        conversation_history.append({'system': response})
+        return render_template('chatbot1.html', conversation=conversation_history)
 
 
 
