@@ -28,6 +28,8 @@
                 <table class="flight-table" style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr>
+                            <th class="bold-header">Flight ID</th>
+                            <th class="bold-header">Airline</th>
                             <th class="bold-header">Flight Number</th>
                             <th class="bold-header">Departure</th>
                             <th class="bold-header">Destination</th>
@@ -42,7 +44,9 @@
                     <tbody>
                         {% for result in list_of_results %}
                             <tr>
+                                <td>{{ result._id }}</td>
                                 <td>{{ result.flightNumber }}</td>
+                                <td>{{ result.airline }}</td>
                                 <td>{{ result.origin }}</td>
                                 <td>{{ result.destination }}</td>
                                 <td>{{ result.daysOfWeek }}</td>

@@ -21,7 +21,7 @@
             {% endfor %}
         </select>
 
-        <!-- Add a date input with a minimum date of today -->
+        <!-- Add a date input with a minimum date of May 1, 2024 -->
         <label for="departure-date">Departure Date:</label>
         <input type="date" id="departure-date" name="departure_date" required>
 
@@ -30,15 +30,13 @@
 
     <script>
         function validateForm() {
-            var today = new Date().toISOString().split('T')[0];
-            document.getElementById('departure-date').setAttribute('min', today);
+            var startDate = new Date("2024-05-01").toISOString().split('T')[0];
+            document.getElementById('departure-date').setAttribute('min', startDate);
             return true;
         }
 
-        // Get today's date in the format YYYY-MM-DD
-        var today = new Date().toISOString().split('T')[0];
-        
-        // Set the minimum date for the date input to today
-        document.getElementById("departure-date").min = today;
+        // Set the minimum date for the date input to May 1, 2024
+        var startDate = new Date("2024-05-01").toISOString().split('T')[0];
+        document.getElementById("departure-date").min = startDate;
     </script>
 {% endblock %}
