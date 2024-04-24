@@ -3,18 +3,19 @@
 {% block title %}Flight Cancellation{% endblock %}
 
 {% block content %}
-    <div class="flex justify-center items-center h-screen">
-        <div class="bg-gray-100 rounded-lg shadow-md p-8">
-            <h1 class="text-3xl font-bold mb-4">Cancel Your Flight</h1>
-            
-            <div class="mt-4 text-center">
-                <form action="/cancel_flight_user" method="POST">
-                    <label for="pnr_id" class="block mb-2">Enter PNR ID:</label>
-                    <input type="text" id="pnr_id" name="pnr_id" required class="border border-gray-400 px-4 py-2 rounded-md mb-4">
-                    
-                    <button type="submit" class="block mx-auto button">Cancel Flight</button>
-                </form>
-            </div>
+<div class="flex justify-center items-center h-screen">
+    <div class="bg-gray-100 rounded-lg shadow-md p-8">
+        <h1 class="text-3xl font-bold mb-4">Cancel Your Flight</h1>
+        
+        <div class="mt-4 text-center">
+            <form action="/cancel_flight_user" method="POST">
+                <label for="pnr_id" class="block mb-2">Enter PNR ID:</label>
+                <input type="text" id="pnr_id" name="pnr_id" required class="border border-gray-400 px-4 py-2 rounded-md mb-4">
+                
+                <button type="submit" class="block mx-auto button">Cancel Flight</button>
+            </form>
         </div>
     </div>
+</div>
+
 {% endblock %}
