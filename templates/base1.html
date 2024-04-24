@@ -558,6 +558,40 @@ video {
   --tw-backdrop-sepia:  ;
 }
 
+.container{
+  width: 100%;
+}
+
+@media (min-width: 640px){
+  .container{
+    max-width: 640px;
+  }
+}
+
+@media (min-width: 768px){
+  .container{
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px){
+  .container{
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px){
+  .container{
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1536px){
+  .container{
+    max-width: 1536px;
+  }
+}
+
 .fixed{
   position: fixed;
 }
@@ -576,6 +610,10 @@ video {
 
 .right-10{
   right: 2.5rem;
+}
+
+.bottom-9{
+  bottom: 2.25rem;
 }
 
 .m-4{
@@ -654,6 +692,10 @@ video {
   margin-top: 2.5rem;
 }
 
+.mb-8{
+  margin-bottom: 2rem;
+}
+
 .block{
   display: block;
 }
@@ -726,6 +768,14 @@ video {
   cursor: pointer;
 }
 
+.grid-cols-1{
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.flex-col{
+  flex-direction: column;
+}
+
 .flex-wrap{
   flex-wrap: wrap;
 }
@@ -752,6 +802,10 @@ video {
 
 .gap-10{
   gap: 2.5rem;
+}
+
+.gap-8{
+  gap: 2rem;
 }
 
 .overflow-hidden{
@@ -1395,6 +1449,10 @@ video {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
+  .md\:grid-cols-2{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .md\:justify-end{
     justify-content: flex-end;
   }
@@ -1407,6 +1465,10 @@ video {
 @media (min-width: 1024px){
   .lg\:grid-cols-3{
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .lg\:grid-cols-4{
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
@@ -1422,13 +1484,15 @@ video {
     
     <nav class="flex bg-indigo-600 h-20 justify-around items-center">
         <div class="flex justify-around items-center text-lg w-full">
-            <div class="">
-                <a href="{{ url_for('flight_search') }}" class="font-bold text-lg flex items-center">
+            <a href="{{ url_for('flight_search') }}" class="font-bold text-lg flex items-center">
+                <div class="">
                     <img src="/static/images/bookMyFlight-removebg-preview.png" class="w-[100px]" alt="BookMyFlight Logo">
-                </a>
-            </div>
+                </div>
+            </a>
             <div class="navTitle">
-                <a href="{{ url_for('flight_search') }}" class="font-bold text-lg">Search Flights</a>
+                <a href="{{ url_for('flight_search') }}" class="font-bold text-lg">
+                    Search Flights
+                </a>
             </div>
             <div class="navTitle">
                 <a href="{{ url_for('get_pnr') }}" class="font-bold text-lg">Get PNR Details</a>

@@ -82,10 +82,8 @@ def flight_search():
             session['from_city'] = from_city
             session['to_city'] = to_city
             session['date_of_flight'] = date_  # Updated key to match the form
-            if 'email' in session:
-                return redirect(url_for('results'))
-            else:
-                return redirect(url_for('login'))  # Redirect to login if user is not logged in
+            return redirect(url_for('results'))
+
     
     # If it's a GET request or if there's a validation error in POST, render the template
     if 'email' in session:
@@ -274,7 +272,7 @@ def user():
     if 'email' in session:
         # Simulate a slow redirect using time.sleep
         time.sleep(2)
-        return redirect(url_for('profile_home', email=session['email']))
+        return redirect(url_for('flight_search', email=session['email']))
 
     flash('You are not logged in.')
     return redirect(url_for('login'))  # Use the endpoint name 'login' instead of the URL rule '/login'
