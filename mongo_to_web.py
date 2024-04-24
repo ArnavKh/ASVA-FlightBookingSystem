@@ -53,20 +53,53 @@ passenger_collection = passenger_db['Passenger_Data']
 # Home page
 @app.route("/")
 def index():
+    # Fetch available cities from MongoDB
+    available_cities = cities_collection.distinct("origin")
+
     # Check if user is logged in
     if 'email' in session:
         # User is logged in, show profile option
-        return render_template("index2.html", show_profile=True, email=session['email'])
+        return render_template("flight_search.html", show_profile=True, email=session['email'], list_of_cities=available_cities)
     else:
         # User is not logged in, show login link
-        return render_template("index2.html", show_login=True)
+        return render_template("flight_search.html", show_login=True, list_of_cities=available_cities)
+    
+#Page for searching flights; source, destination and date fields
+@app.route('/flight_search', methods=('GET', 'POST'))
+def flight_search():
+    # Fetch available cities from MongoDB
+    available_cities = cities_collection.distinct("origin")
+    
+    if request.method == 'POST':
+        from_city = request.form['from']
+        to_city = request.form['to']
+        date_ = request.form['departure_date']
+        
+        if from_city == to_city:
+            flash('Source and destination cities cannot be the same. Please choose different cities.')
+        else:
+            # Store data in session variables
+            session['from_city'] = from_city
+            session['to_city'] = to_city
+            session['date_of_flight'] = date_  # Updated key to match the form
+            if 'email' in session:
+                return redirect(url_for('results'))
+            else:
+                return redirect(url_for('login'))  # Redirect to login if user is not logged in
+    
+    # If it's a GET request or if there's a validation error in POST, render the template
+    if 'email' in session:
+        return render_template("flight_search.html", show_profile=True, email=session['email'], list_of_cities=available_cities)
+    else:
+        return render_template("flight_search.html", show_login=True, list_of_cities=available_cities)
+
 
 
 nltk.download('punkt')   #For tokenization
 nltk.download('stopwords')  #For removing the commonly used term(like 'and','is','was','they',etc.)
 
 # Path to the data file
-data=pd.read_csv("/Users/vaidat/Flight-Booking/Flight_Booking_System.flights.csv")
+data=pd.read_csv("Flight_Booking_System.flights.csv")
 
 def preprocess_text(text):
     stop_words = set(stopwords.words('english'))
@@ -266,37 +299,6 @@ def logout():
     # Remove current session
     session.pop('email', None)
     return redirect('/')
-
-
-
-#Page for searching flights; source, destination and date fields
-@app.route('/flight_search', methods=('GET', 'POST'))
-def flight_search():
-    # Fetch available cities from MongoDB
-    global available_cities 
-    available_cities = cities_collection.distinct("origin")
-
-    if request.method == 'POST':
-        from_city = request.form['from']
-        to_city = request.form['to']
-        date_ = request.form['departure_date']
-
-        if from_city == to_city:
-            flash('Source and destination cities cannot be the same. Please choose different cities.')
-        else:
-            # Store data in session variables
-            session['from_city'] = from_city
-            session['to_city'] = to_city
-            session['date_of_flight'] = date_  # Updated key to match the form
-            return redirect(url_for('results'))
-
-    return render_template('flight_search.html', list_of_cities=available_cities)
-
-
-
-
-
-
 
 
 

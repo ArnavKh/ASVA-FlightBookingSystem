@@ -1,39 +1,52 @@
 <!-- Save this file as 'book_flight.html' -->
+<!-- <link rel = "stylesheet" href = "styles.css"> -->
+
 {% extends "base1.html" %}
 
 {% block title %}Book Flight{% endblock %}
 
 {% block content %}
-    <div style="text-align: center;">
-        <h1>Booking Details</h1>
+    <div class="flex justify-center items-center h-screen">
+        <div class="bg-white rounded-lg p-8 shadow-md">
+            <h1 class="text-3xl font-bold mb-4 text-center">Booking Details</h1>
 
-        {% if book_flight_record %}
-            <p>Flight Number: {{ book_flight_record.flightNumber }}</p>
-            <p>Departure: {{ book_flight_record.origin }}</p>
-            <p>Destination: {{ book_flight_record.destination }}</p>
-            <p>Date of Journey: {{ date_ }}</p>
+            {% if book_flight_record %}
+                <p class="mb-4"><b>Flight Number:</b> {{ book_flight_record.flightNumber }}</p>
+                <p class="mb-4"><b>Departure:</B> {{ book_flight_record.origin }}</p>
+                <p class="mb-4"><b>Destination</b> {{ book_flight_record.destination }}</p>
+                <p class="mb-4"><b>Date of Journey:</b> {{ date_ }}</p>
 
-            <form method="post" action="{{ url_for('confirm_booking') }}">
-                <h2>Passenger Information</h2>
-                <label for="name">Name:</label>
-                <input type="text" name="name" required><br>
+                <form method="post" action="{{ url_for('confirm_booking') }}" class="flex flex-wrap justify-center">
+                    <div class="mb-4 mr-4">
+                        <label for="name" class="block mb-1 font-bold">Name:</label>
+                        <input type="text" name="name" required class="border py-2 px-4 mb-2 rounded-md">
+                    </div>
 
-                <label for="age">Age:</label>
-                <input type="number" name="age" required><br>
+                    <div class="mb-4 mr-4">
+                        <label for="age" class="block mb-1 font-bold">Age:</label>
+                        <input type="number" name="age" required class="border py-2 px-4 mb-2 rounded-md">
+                    </div>
 
-                <label for="aadhaar">Aadhaar Card Number:</label>
-                <input type="text" name="aadhaar" required><br>
+                    <div class="mb-4 mr-4">
+                        <label for="aadhaar" class="block mb-1 font-bold">Aadhaar Card Number:</label>
+                        <input type="text" name="aadhaar" required class="border py-2 px-4 mb-2 rounded-md">
+                    </div>
 
-                <label for="address">Address:</label>
-                <input type="text" name="address" required><br>
+                    <div class="mb-4 mr-4">
+                        <label for="address" class="block mb-1 font-bold">Address:</label>
+                        <input type="text" name="address" required class="border py-2 px-4 mb-4 rounded-md">
+                    </div>
 
-                <!-- Include other passenger details as needed -->
-
-                <input type="hidden" name="flight_id" value="{{ book_flight_record._id }}">
-                <input type="submit" value="Confirm Booking">
-            </form>
-        {% else %}
-            <p>Flight not found.</p>
-        {% endif %}
+                    <div class="w-full flex justify-center">
+                        <input type="hidden" name="flight_id" value="{{ book_flight_record._id }}">
+                        <input type="submit" value="Confirm Booking" class="button">
+                    </div>
+                </form>
+            {% else %}
+            <div class="bg-red-100 border border-red-400  px-4 py-3 rounded-lg mt-4 text-center">
+                <h1 class="text-xl text-red-700 font-bold">Flight not found.</h1>
+            </div>
+            {% endif %}
+        </div>
     </div>
 {% endblock %}

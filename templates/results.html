@@ -1,58 +1,59 @@
 <!-- Search results if user is not logged in -->
 
+<!-- <link rel = "stylesheet" href = "styles.css"> -->
+
 {% extends "base1.html" %}
 
 {% block title %}Search Results for flights from {{ from_city }} to {{ to_city }}{% endblock %}
 
 {% block content %}
-    <div style="text-align: center;">
-        <h1>Search results</h1>
-        <p>Source: <b>{{ from_city }}</b></p>
-        <p>Destination: <b>{{ to_city }}</b></p>
-        <p>Date selected: <b>{{ dateoftrip }}, {{ dayofweek }}</b></p>
+<div class = "mx-8">
+    <h1 class="text-3xl font-bold">Search results</h1>
+    <p><b>Source:</b>{{ from_city }}</p>
+    <p><b>Destination: </b>{{ to_city }}</p>
+    <p><b>Date selected: </b>{{ dateoftrip }}, {{ dayofweek }}</p>
 
-        {% if list_of_results %}
-            <div class="results-table-container">
-                <table class="flight-table">
-                    <thead>
+    {% if list_of_results %}
+        <div class="mt-4 text-center">
+            <table class="w-full bg-white shadow-md rounded-lg overflow-hidden">
+                <thead class="bg-gray-200 text-gray-700">
+                    <tr>
+                        <th class="py-2">Origin</th>
+                        <th class="py-2">Destination</th>
+                        <th class="py-2">Flight Number</th>
+                        <th class="py-2">Departure Time</th>
+                        <th class="py-2">Arrival Time</th>
+                        <th class="py-2">Total Travel Time</th>
+                        <th class="py-2">Rate</th>
+                        <th class="py-2">Book Flight</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-600">
+                    {% for flight in list_of_results %}
                         <tr>
-                            <th>Origin</th>
-                            <th>Destination</th>
-                            <th>Flight Number</th>
-                            <th>Days of Week</th>
-                            <th>Departure Time</th>
-                            <th>Arrival Time</th>
-                            <th>Total Travel Time</th>
-                            <th>Rate</th>
-                            <th>Book Flight</th>
+                            <td class="py-2">{{ flight.origin }}</td>
+                            <td class="py-2">{{ flight.destination }}</td>
+                            <td class="py-2">{{ flight.flightNumber }}</td>
+                            <td class="py-2">{{ flight.scheduledDepartureTime }}</td>
+                            <td class="py-2">{{ flight.scheduledArrivalTime }}</td>
+                            <td class="py-2">{{ flight.flightTime }}</td>
+                            <td class="py-2">{{ flight.rate }}</td>
+                            <td class="py-2">
+                                <form action="https://example.com/booking" method="post" target="_blank">
+                                    <input type="hidden" name="flight_number" value="{{ flight.flightNumber }}">
+                                    <button type="submit" class="button">Book Now</button>
+                                </form>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {% for flight in list_of_results %}
-                            <tr>
-                                <td>{{ flight.origin }}</td>
-                                <td>{{ flight.destination }}</td>
-                                <td>{{ flight.flightNumber }}</td>
-                                <td>{{ flight.daysOfWeek }}</td>
-                                <td>{{ flight.scheduledDepartureTime }}</td>
-                                <td>{{ flight.scheduledArrivalTime }}</td>
-                                <td>{{ flight.flightTime }}</td>
-                                <td>{{ flight.rate }}</td>
-                                <td>
-                                    <form action="https://example.com/booking" method="post" target="_blank">
-                                        <input type="hidden" name="flight_number" value="{{ flight.flightNumber }}">
-                                        <input type="submit" value="Book Now">
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <div style="background-color: #ffe6e6; padding: 10px; border: 2px solid #ff6666; margin: 10px 0;">
-                <h1 style="color: #ff3333; font-size: 24px; font-weight: bold;">No results found.</h1>
-            </div>
-        {% endif %}
-    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="bg-red-100 border border-red-400  px-4 py-3 rounded-lg mt-4 text-center">
+            <h1 class="text-xl text-red-700 font-bold">No results found.</h1>
+        </div>
+    {% endif %}
+</div>
+
 {% endblock %}
