@@ -1,0 +1,45 @@
+{% extends "base1.html" %}
+<!-- <link rel = "stylesheet" href = "styles.css"> -->
+
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+
+<div class="flex justify-center items-center h-screen">
+    <div class="chat-popup bg-white rounded-lg shadow-md p-8">
+        <form action="/chat" class="form-container" method="post">
+            <h1 class="text-3xl font-bold mb-4">Chat</h1>
+            <div id="conversation-container">
+                <div id="conversation">
+                    {% for message in conversation %}
+                        {% if message.system %}
+                            <p><strong>System:</strong> {{ message.system }}</p>
+                        {% endif %}
+                        {% if message.user %}
+                            <p><strong>User:</strong> {{ message.user }}</p>
+                        {% endif %}
+                        {% if message.question %}
+                            <p class="pt-2"><strong>System:</strong> {{ message.question }}</p>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            <textarea placeholder="Type message.." name="user_input" required class="border border-gray-400 px-4 py-2 rounded-md mb-4 mt-10 block w-full"></textarea>
+            <button type="submit" class="button">Send</button>
+            <button type="button" id="clear-conversation-btn" class="bg-red-600 hover:opacity-90 text-white px-4 py-2 rounded-full mt-6 shadow-lg;">Clear Conversation</button>
+        </form>
+    </div>
+</div>
+
+
+    <script>
+        // Function to clear conversation
+        function clearConversation() {
+            document.getElementById('conversation').innerHTML = '';
+        }
+
+        // Event listener for clear conversation button
+        document.getElementById('clear-conversation-btn').addEventListener('click', clearConversation);
+    </script>
+ 
+ {% endblock %}
