@@ -1,10 +1,18 @@
-# Flight-Booking
 
-A comprehensive flight booking system with features such as selecting departure/arrival details and viewing flights matching the description, account creation, personalized flight recommendations, selecting quanity and location of seats, booking the flight, and lastly a payment portal
+# BookMyFlight - Flight Booking System
+![Flight Booking System](/homePage.png)
 
-For exploring, use the secondary branch
+A comprehensive flight booking system with the following features:
 
-Members of this project are:
+- Selecting departure/arrival details
+- Viewing flights matching the description
+- Account creation
+- Booking the flight
+
+
+
+## Project Members
+
 - Arnav Khadkatkar
 - Surab Sebait
 - Vaidat Patel
