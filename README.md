@@ -1,6 +1,6 @@
 
 # BookMyFlight - Flight Booking System
-![Flight Booking System](/video_demo.mp4)
+![Flight Booking System](/homePage.png)
 
 A comprehensive flight booking system with the following features:
 
