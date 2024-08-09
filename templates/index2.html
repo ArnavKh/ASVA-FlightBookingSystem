@@ -1,0 +1,21 @@
+{% extends "base1.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+    <div class="flex justify-center items-center h-screen">
+        <div class="text-center">
+            <h1 class="text-3xl font-bold mb-4">Welcome to BookMyFlight!</h1>
+
+            {% if show_profile %}
+                <p class="mb-2">Hello, {{ email }}!</p>
+                <!-- <p class="mb-2"><a href="{{ url_for('profile_home', email=session['email']) }}" class="text-blue-500 hover:underline">Go to your profile</a></p> -->
+                <p class="mb-2"><a href="{{ url_for('my_bookings') }}" class="text-blue-500 hover:underline">View My Bookings</a></p>
+                <p><a href="{{ url_for('logout') }}" class="text-red-500 hover:underline">Logout</a></p>
+            {% elif show_login %}
+                <p class="mb-2">Please <b><a href="{{ url_for('login') }}" class="text-blue-500 hover:underline hover:text-indigo-600">log in</a></b> to access additional features.</p>
+                <p>New user? <a href="{{ url_for('register') }}" class="text-blue-500 hover:underline"><b>Sign up here</b></a>.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

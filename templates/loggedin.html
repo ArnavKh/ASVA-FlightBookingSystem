@@ -1,0 +1,21 @@
+<!-- loggedin.html -->
+
+{% extends "base1.html" %}
+{% block content %}
+<div>
+    <div>
+        <div>
+            <form method="POST" action="{{ url_for('logout') }}">
+                <p>Logged in as {{ session['username'] }}</p>
+                <button type="submit">Log Out</button>
+            </form>
+            <br>
+
+            <!-- Button to go back to the profile_home page -->
+            <a href="{{ url_for('profile_home', username=session['username']) }}">
+                <button>Go Back to Profile</button>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
